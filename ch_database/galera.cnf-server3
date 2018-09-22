@@ -34,7 +34,7 @@ wsrep_sst_method=rsync
 
 # Galera Node Configuration
 wsrep_node_address="10.130.101.22" # Change_here  Server3
-wsrep_node_name="Database01" # Change_here
+wsrep_node_name="Database03" # Change_here
 
 wsrep_slave_threads=4
 
