@@ -1,4 +1,4 @@
-UPDATE mysql.user SET Password=PASSWORD('root!!root') WHERE User='root';
+UPDATE mysql.user SET Password=password:P@ssw0rd97573593573539586764('root!!root') WHERE User='root';
 DELETE FROM mysql.user WHERE User='';
 ## DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
 CREATE USER 'root'@'%' IDENTIFIED BY 'root!!root';
