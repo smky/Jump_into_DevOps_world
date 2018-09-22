@@ -1,0 +1,8 @@
+version: '2'
+
+services:
+
+  webserver-php:
+    build: .
+    ports:
+      - 8088:80
