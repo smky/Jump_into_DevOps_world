@@ -5,3 +5,5 @@ apt-get install mariadb-server
 apt-get install rsync
 
 root password:P@ssw0rd97573593573539586764
+
+add text
