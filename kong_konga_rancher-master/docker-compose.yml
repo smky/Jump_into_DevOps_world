@@ -1,0 +1,52 @@
+version: '2'
+services:
+  konga:
+    image: pantsel/konga:latest
+    environment:
+      DB_ADAPTER: mysql
+      DB_HOST: 127.0.0.01 ## Change IP
+      DB_USER: this_is_mysql_user
+      DB_PASSWORD: this_is_mysql_password
+      DB_DATABASE: konga_database
+    command:
+    - npm
+    - run
+    - prepare
+    labels:
+      io.rancher.scheduler.affinity:host_label: lb=true
+  kong-migration:
+    image: kong:0.13.1
+    environment:
+      KONG_DATABASE: cassandra
+      KONG_CASSANDRA_CONTACT_POINTS: cassandra-node1,cassandra-node2
+      KONG_CASSANDRA_USERNAME: cassandra
+      KONG_CASSANDRA_PASSWORD: this_is_cassandra_password
+    external_links:
+    - cassandra/cassandra-node1:cassandra-node1
+    - cassandra/cassandra-node2:cassandra-node2
+    command:
+    - kong
+    - migrations
+    - up
+    labels:
+      io.rancher.scheduler.affinity:host_label: lb=true
+      io.rancher.container.start_once: 'true'
+  kong:
+    image: kong:0.13.1
+    environment:
+      KONG_DATABASE: cassandra
+      KONG_CASSANDRA_CONTACT_POINTS: cassandra-node1,cassandra-node2
+      KONG_CASSANDRA_USERNAME: cassandra
+      KONG_CASSANDRA_PASSWORD: this_is_cassandra_password
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+      KONG_PROXY_LISTEN: 0.0.0.0:8000
+      KONG_PROXY_LISTEN_SSL: 0.0.0.0:8443
+    external_links:
+    - gateway-external/api-gateway-external:api-external
+    - cassandra/cassandra-node1:cassandra-node1
+    - cassandra/cassandra-node2:cassandra-node2  
+    links:
+    - kong-migration:kong-migration
+    labels:
+      io.rancher.scheduler.affinity:host_label: lb=true
+      io.rancher.scheduler.affinity:container_label_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name}

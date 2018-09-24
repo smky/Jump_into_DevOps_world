@@ -1,0 +1,18 @@
+version: '2'
+services:
+  fix-cassandra-permissions1:
+    retain_ip: true
+    scale: 1
+    start_on_create: true
+  cassandra-node1:
+    retain_ip: true
+    scale: 1
+    start_on_create: true
+  fix-cassandra-permissions2:
+    retain_ip: true
+    scale: 1
+    start_on_create: true
+  cassandra-node2:
+    retain_ip: true
+    scale: 1
+    start_on_create: true

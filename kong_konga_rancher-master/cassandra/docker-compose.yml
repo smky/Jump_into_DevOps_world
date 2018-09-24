@@ -1,0 +1,68 @@
+version: '2'
+volumes:
+  cassandra-node1:
+    driver: rancher-nfs
+    per_container: true
+  cassandra-node2:
+    driver: rancher-nfs
+    per_container: true
+services:
+  fix-cassandra-permissions1:
+    image: bitnami/cassandra:latest
+    stdin_open: true
+    volumes:
+    - cassandra-node1:/bitnami
+    tty: true
+    user: root
+    command:
+    - chown
+    - -R
+    - 1001:1001
+    - /bitnami
+    labels:
+      io.rancher.container.start_once: 'true'
+      io.rancher.container.pull_image: always
+  cassandra-node1:
+    image: bitnami/cassandra:latest
+    environment:
+      CASSANDRA_CLUSTER_NAME: cassandra-cluster
+      CASSANDRA_SEEDS: cassandra-node1,cassandra-node2
+      CASSANDRA_PASSWORD_SEEDER: 'yes'
+      CASSANDRA_PASSWORD: this_is_cassandra_password
+    stdin_open: true
+    tty: true
+    volumes_from:
+    - fix-cassandra-permissions1
+    labels:
+      io.rancher.container.pull_image: always
+      io.rancher.sidekicks: fix-cassandra-permissions1
+  fix-cassandra-permissions2:
+    image: bitnami/cassandra:latest
+    stdin_open: true
+    volumes:
+    - cassandra-node1:/bitnami
+    tty: true
+    user: root
+    command:
+    - chown
+    - -R
+    - 1001:1001
+    - /bitnami
+    labels:
+      io.rancher.container.start_once: 'true'
+      io.rancher.container.pull_image: always
+  cassandra-node2:
+    image: bitnami/cassandra:latest
+    environment:
+      CASSANDRA_CLUSTER_NAME: cassandra-cluster
+      CASSANDRA_SEEDS: cassandra-node1,cassandra-node2
+      CASSANDRA_PASSWORD: this_is_cassandra_password
+    stdin_open: true
+    tty: true
+    links:
+    - cassandra-node1
+    volumes_from:
+    - fix-cassandra-permissions2
+    labels:
+      io.rancher.container.pull_image: always
+      io.rancher.sidekicks: fix-cassandra-permissions2
